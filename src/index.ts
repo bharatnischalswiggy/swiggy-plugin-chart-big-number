@@ -18,4 +18,5 @@
  */
 
 export { default as BigNumberChart2Plugin } from './BigNumber2/index';
+export { default as BigNumberChart3Plugin } from './BigNumber3/index';
 export { default as BigNumberChartPreset } from './preset';

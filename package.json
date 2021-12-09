@@ -1,7 +1,7 @@
 {
-  "name": "@superset-ui/swiggy-plugin-chart-big-number",
-  "version": "0.18.25",
-  "description": "Superset Legacy Chart - Big Number",
+  "name": "@bharatnischal/superset-custom-chart-plugin",
+  "version": "1.0.2",
+  "description": "Custom Superset Chart plugin",
   "sideEffects": [
     "*.css"
   ],
@@ -13,17 +13,17 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/apache-superset/superset-ui.git"
+    "url": "git+https://github.com/bharatnischalswiggy/swiggy-plugin-chart-big-number.git"
   },
   "keywords": [
     "superset"
   ],
-  "author": "Superset",
+  "author": "Bharat Nischal",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/apache-superset/superset-ui/issues"
+    "url": "https://github.com/bharatnischalswiggy/swiggy-plugin-chart-big-number/issues"
   },
-  "homepage": "https://github.com/apache-superset/superset-ui#readme",
+  "homepage": "https://github.com/bharatnischalswiggy/swiggy-plugin-chart-big-number#readme",
   "publishConfig": {
     "access": "public"
   },
@@ -34,7 +34,8 @@
     "@types/d3-color": "^1.2.2",
     "@types/shortid": "^0.0.29",
     "d3-color": "^1.2.3",
-    "shortid": "^2.2.14"
+    "shortid": "^2.2.14",
+    "react": "^16.13.1"
   },
   "peerDependencies": {
     "react": "^15 || ^16"

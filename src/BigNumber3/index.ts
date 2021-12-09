@@ -31,7 +31,7 @@ const metadata = new ChartMetadata({
     'Showcases a single number accompanied by a simple line chart, to call attention to an important metric along with its change over time or other dimension.',
   ),
   exampleGallery: [{ url: example }],
-  name: 'Big Number with Trendline (WoW)',
+  name: 'Anobis WoW',
   tags: [
     t('Advanced-Analytics'),
     t('Formattable'),
