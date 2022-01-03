@@ -364,7 +364,6 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
 
     if (showTrendLine) {
       const chartHeight = Math.floor(PROPORTION.TRENDLINE * height);
-      const allTextHeight = height - chartHeight;
 
       return (
         <div

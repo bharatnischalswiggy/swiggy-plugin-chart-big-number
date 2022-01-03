@@ -74,7 +74,6 @@ export default function transformProps(chartProps: BigNumberChartProps) {
     startYAxisAtZero,
     subheader = '',
     subheaderFontSize,
-    vizType,
     timeRangeFixed = false,
     positiveColor,
     negativeColor,
@@ -90,7 +89,7 @@ export default function transformProps(chartProps: BigNumberChartProps) {
   } = queriesData[0];
   const metricName = typeof metric === 'string' ? metric : metric.label;
   const compareLag = Number(compareLag_) || 0;
-  const supportTrendLine = vizType === 'big_number3';
+  const supportTrendLine = true;
   const supportAndShowTrendLine = supportTrendLine && showTrendLine;
   let formattedSubheader = subheader;
 
