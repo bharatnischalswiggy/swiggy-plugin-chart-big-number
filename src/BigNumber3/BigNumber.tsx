@@ -263,7 +263,7 @@ class BigNumberVis extends React.PureComponent<BigNumberVisProps, {}> {
               : negativeChangeColor,
           }}
         >
-          {text} WOW
+          {text}
         </div>
       );
     }

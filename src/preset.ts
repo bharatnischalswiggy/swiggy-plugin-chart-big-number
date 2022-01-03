@@ -17,17 +17,13 @@
  * under the License.
  */
 import { Preset } from '@superset-ui/core';
-import BigNumberChart2Plugin from './BigNumber2';
 import BigNumberChart3Plugin from './BigNumber3';
 
 export default class BigNumberChartPreset extends Preset {
   constructor() {
     super({
       name: 'BigNumber charts',
-      plugins: [
-        new BigNumberChart2Plugin().configure({ key: 'big_number2' }),
-        new BigNumberChart3Plugin().configure({ key: 'big_number3' }),
-      ],
+      plugins: [new BigNumberChart3Plugin().configure({ key: 'big_number3' })],
     });
   }
 }

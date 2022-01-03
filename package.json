@@ -1,10 +1,13 @@
 {
-  "name": "@bharatnischal/superset-custom-chart-plugin",
-  "version": "1.0.2",
+  "name": "@superset-ui/superset-custom-chart-plugin",
+  "version": "1.0.4",
   "description": "Custom Superset Chart plugin",
   "sideEffects": [
     "*.css"
   ],
+  "scripts": {
+    "build": "webpack --mode production"
+  },
   "main": "lib/index.js",
   "module": "esm/index.js",
   "files": [
@@ -34,8 +37,7 @@
     "@types/d3-color": "^1.2.2",
     "@types/shortid": "^0.0.29",
     "d3-color": "^1.2.3",
-    "shortid": "^2.2.14",
-    "react": "^16.13.1"
+    "shortid": "^2.2.14"
   },
   "peerDependencies": {
     "react": "^15 || ^16"
