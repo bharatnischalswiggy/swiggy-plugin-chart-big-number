@@ -386,7 +386,7 @@ export default function transformProps(
       0,
     );
 
-    percentageChange = ((currentCount - previousCount) / currentCount) * 100;
+    percentageChange = ((currentCount - previousCount) / previousCount) * 100;
   }
 
   return {
