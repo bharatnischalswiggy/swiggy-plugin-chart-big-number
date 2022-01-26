@@ -1,4 +1,6 @@
-/*
+import { LegendOrientation } from './types';
+
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,7 +18,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+export const defaultGrid = {
+  containLabel: true,
+};
 
-export { default as AnobisBigNumberChartPlugin } from './BigNumber3/index';
-export { default as AnobisTimeSeriesLineChart } from './Echarts/Timeseries/Regular/Line';
-export { default as BigNumberChartPreset } from './preset';
+export const defaultTooltip = {
+  confine: true,
+};
+
+export const defaultYAxis = {
+  scale: true,
+};
+
+export const defaultLegendPadding = {
+  [LegendOrientation.Top]: 20,
+  [LegendOrientation.Bottom]: 20,
+  [LegendOrientation.Left]: 170,
+  [LegendOrientation.Right]: 170,
+};

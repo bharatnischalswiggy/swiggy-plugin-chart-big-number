@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -17,6 +17,22 @@
  * under the License.
  */
 
-export { default as AnobisBigNumberChartPlugin } from './BigNumber3/index';
-export { default as AnobisTimeSeriesLineChart } from './Echarts/Timeseries/Regular/Line';
-export { default as BigNumberChartPreset } from './preset';
+import { validateNumber } from '@superset-ui/core';
+
+// eslint-disable-next-line import/prefer-default-export
+export function parseYAxisBound(
+  bound?: string | number | null,
+): number | undefined {
+  if (bound === undefined || bound === null || Number.isNaN(Number(bound))) {
+    return undefined;
+  }
+  return Number(bound);
+}
+
+export function parseNumbersList(value: string, delim = ';') {
+  if (!value || !value.trim()) return [];
+  return value.split(delim).map(num => {
+    if (validateNumber(num)) throw new Error('All values must be numeric');
+    return Number(num);
+  });
+}
