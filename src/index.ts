@@ -17,6 +17,5 @@
  * under the License.
  */
 
-export { default as AnobisBigNumberChartPlugin } from './BigNumber3/index';
-export { default as AnobisTimeSeriesLineChart } from './Echarts/Timeseries/Regular/Line';
-export { default as BigNumberChartPreset } from './preset';
+export * from './Echarts';
+export { default as AnobisChartPreset } from './preset';

@@ -45,10 +45,9 @@ function Echart(
 ) {
   const divRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<ECharts>();
-  const currentSelection = useMemo(
-    () => Object.keys(selectedValues) || [],
-    [selectedValues],
-  );
+  const currentSelection = useMemo(() => Object.keys(selectedValues) || [], [
+    selectedValues,
+  ]);
   const previousSelection = useRef<string[]>([]);
 
   useImperativeHandle(ref, () => ({

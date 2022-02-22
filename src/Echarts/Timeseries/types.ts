@@ -125,5 +125,4 @@ export interface EchartsTimeseriesChartProps extends ChartProps {
   queriesData: ChartDataResponseResult[];
 }
 
-export type TimeseriesChartTransformedProps =
-  EChartTransformedProps<EchartsTimeseriesFormData>;
+export type TimeseriesChartTransformedProps = EChartTransformedProps<EchartsTimeseriesFormData>;

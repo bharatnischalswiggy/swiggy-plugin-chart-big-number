@@ -18,13 +18,8 @@
  */
 /* eslint-disable camelcase */
 import {
-  AnnotationLayer,
   CategoricalColorNamespace,
   getNumberFormatter,
-  isEventAnnotationLayer,
-  isFormulaAnnotationLayer,
-  isIntervalAnnotationLayer,
-  isTimeseriesAnnotationLayer,
   TimeseriesChartDataResponseResult,
   DataRecordValue,
 } from '@superset-ui/core';
@@ -56,11 +51,7 @@ import {
   getPadding,
   getTooltipTimeFormatter,
   getXAxisFormatter,
-  transformEventAnnotation,
-  transformFormulaAnnotation,
-  transformIntervalAnnotation,
   transformSeries,
-  transformTimeseriesAnnotation,
 } from './transformers';
 import { TIMESERIES_CONSTANTS } from '../constants';
 
@@ -77,8 +68,10 @@ export default function transformProps(
     datasource,
   } = chartProps;
   const { verboseMap = {} } = datasource;
-  const { annotation_data: annotationData_, data = [] } =
-    queriesData[0] as TimeseriesChartDataResponseResult;
+  const {
+    annotation_data: annotationData_,
+    data = [],
+  } = queriesData[0] as TimeseriesChartDataResponseResult;
   const annotationData = annotationData_ || {};
 
   const {
@@ -119,6 +112,7 @@ export default function transformProps(
     positiveColor,
     negativeColor,
     suffix,
+    isPercentageChange,
   }: EchartsTimeseriesFormData = { ...DEFAULT_FORM_DATA, ...formData };
   const colorScale = CategoricalColorNamespace.getScale(colorScheme as string);
   const rebasedData = rebaseTimeseriesDatum(data, verboseMap);
@@ -186,36 +180,6 @@ export default function transformProps(
     },
     {},
   );
-
-  annotationLayers
-    .filter((layer: AnnotationLayer) => layer.show)
-    .forEach((layer: AnnotationLayer) => {
-      if (isFormulaAnnotationLayer(layer))
-        series.push(transformFormulaAnnotation(layer, data, colorScale));
-      else if (isIntervalAnnotationLayer(layer)) {
-        series.push(
-          ...transformIntervalAnnotation(
-            layer,
-            data,
-            annotationData,
-            colorScale,
-          ),
-        );
-      } else if (isEventAnnotationLayer(layer)) {
-        series.push(
-          ...transformEventAnnotation(layer, data, annotationData, colorScale),
-        );
-      } else if (isTimeseriesAnnotationLayer(layer)) {
-        series.push(
-          ...transformTimeseriesAnnotation(
-            layer,
-            markerSize,
-            data,
-            annotationData,
-          ),
-        );
-      }
-    });
 
   // yAxisBounds need to be parsed to replace incompatible values with undefined
   let [min, max] = (yAxisBounds || []).map(parseYAxisBound);
@@ -311,8 +275,10 @@ export default function transformProps(
         }
 
         const rows: Array<string> = [`${tooltipFormatter(xValue)}`];
-        const prophetValues: Record<string, ProphetValue> =
-          extractProphetValuesFromTooltipParams(prophetValue);
+        const prophetValues: Record<
+          string,
+          ProphetValue
+        > = extractProphetValuesFromTooltipParams(prophetValue);
 
         Object.keys(prophetValues).forEach(key => {
           const value = prophetValues[key];
@@ -373,20 +339,26 @@ export default function transformProps(
     negativeChangeColor = `rgba(${r},${g}, ${b}, ${a})`;
   }
 
-  const timeShiftAvailable = echartOptions?.series.length === 2;
-  const currentCount = echartOptions?.series[0]?.data?.reduce(
-    (acc, [, count]) => acc + count,
+  const timeShiftAvailable = (echartOptions as any)?.series.length === 2;
+  const currentCount = (echartOptions as any)?.series[0]?.data?.reduce(
+    (acc: number, [, count]: Array<number>) => acc + count,
     0,
   );
 
-  let percentageChange;
+  let comparisonValue;
   if (timeShiftAvailable) {
-    const previousCount = echartOptions?.series[1]?.data?.reduce(
-      (acc, [, count]) => acc + count,
+    const previousCount = (echartOptions as any)?.series[1]?.data?.reduce(
+      (acc: number, [, count]: Array<number>) => acc + count,
       0,
     );
 
-    percentageChange = ((currentCount - previousCount) / previousCount) * 100;
+    if (isPercentageChange) {
+      comparisonValue = previousCount
+        ? ((currentCount - previousCount) / previousCount) * 100
+        : 0.0;
+    } else {
+      comparisonValue = currentCount - previousCount;
+    }
   }
 
   return {
@@ -403,7 +375,8 @@ export default function transformProps(
     positiveChangeColor,
     negativeChangeColor,
     bigNumber: getNumberFormatter('SMART_NUMBER')(currentCount),
-    percentageChange,
+    comparisonValue,
     suffix,
+    isPercentageChange,
   };
 }

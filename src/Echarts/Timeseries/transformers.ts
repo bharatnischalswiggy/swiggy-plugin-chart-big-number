@@ -22,7 +22,7 @@ import {
   CategoricalColorScale,
   EventAnnotationLayer,
   FilterState,
-  FormulaAnnotationLayer,
+  // FormulaAnnotationLayer,
   getTimeFormatter,
   IntervalAnnotationLayer,
   isTimeseriesAnnotationResult,
@@ -36,9 +36,9 @@ import {
 import { SeriesOption } from 'echarts';
 import {
   CallbackDataParams,
-  DefaultStatesMixin,
+  // DefaultStatesMixin,
   ItemStyleOption,
-  LineStyleOption,
+  // LineStyleOption,
   OptionName,
   SeriesLabelOption,
   SeriesLineLabelOption,
@@ -55,7 +55,7 @@ import { ForecastSeriesEnum, LegendOrientation } from '../types';
 import { EchartsTimeseriesSeriesType } from './types';
 
 import {
-  evalFormula,
+  // evalFormula,
   extractRecordAnnotations,
   formatAnnotationLabel,
   parseAnnotationOpacity,
@@ -223,29 +223,30 @@ export function transformSeries(
   };
 }
 
-export function transformFormulaAnnotation(
-  layer: FormulaAnnotationLayer,
-  data: TimeseriesDataRecord[],
-  colorScale: CategoricalColorScale,
-): SeriesOption {
-  const { name, color, opacity, width, style } = layer;
-  return {
-    name,
-    id: name,
-    itemStyle: {
-      color: color || colorScale(name),
-    },
-    lineStyle: {
-      opacity: parseAnnotationOpacity(opacity),
-      type: style as ZRLineType,
-      width,
-    },
-    type: 'line',
-    smooth: true,
-    data: evalFormula(layer, data),
-    symbolSize: 0,
-  };
-}
+// export function transformFormulaAnnotation(
+//   layer: FormulaAnnotationLayer,
+//   data: TimeseriesDataRecord[],
+//   colorScale: CategoricalColorScale,
+// ): SeriesOption {
+//   const { name, color, opacity, width, style } = layer;
+//   return {
+//     name,
+//     id: name,
+//     itemStyle: {
+//       color: color || colorScale(name),
+//     },
+//     lineStyle: {
+//       opacity: parseAnnotationOpacity(opacity),
+//       type: style as ZRLineType,
+//       width,
+//     },
+//     type: 'line',
+//     smooth: true,
+//     // data: evalFormula(layer, data),
+//     data,
+//     symbolSize: 0,
+//   };
+// }
 
 export function transformIntervalAnnotation(
   layer: IntervalAnnotationLayer,
@@ -256,7 +257,8 @@ export function transformIntervalAnnotation(
   const series: SeriesOption[] = [];
   const annotations = extractRecordAnnotations(layer, annotationData);
   annotations.forEach(annotation => {
-    const { name, color, opacity, showLabel } = layer;
+    const { name, color, opacity } = layer;
+    const showLabel = false;
     const { descriptions, intervalEnd, time, title } = annotation;
     const label = formatAnnotationLabel(name, title, descriptions);
     const intervalData: (
@@ -329,17 +331,18 @@ export function transformEventAnnotation(
   const series: SeriesOption[] = [];
   const annotations = extractRecordAnnotations(layer, annotationData);
   annotations.forEach(annotation => {
-    const { name, color, opacity, style, width, showLabel } = layer;
+    const { name, color, opacity, style, width } = layer;
+    const showLabel = false;
     const { descriptions, time, title } = annotation;
     const label = formatAnnotationLabel(name, title, descriptions);
     const eventData: MarkLine1DDataItemOption[] = [
       {
         name: label,
-        xAxis: time as unknown as number,
+        xAxis: (time as unknown) as number,
       },
     ];
 
-    const lineStyle: LineStyleOption & DefaultStatesMixin['emphasis'] = {
+    const lineStyle: any = {
       width,
       type: style as ZRLineType,
       color: color || colorScale(name),

@@ -17,13 +17,14 @@
  * under the License.
  */
 import React from 'react';
-import { t } from '@superset-ui/core';
+import { t, ComparisionType } from '@superset-ui/core';
 import {
   ControlPanelConfig,
   ControlPanelsContainerProps,
   D3_TIME_FORMAT_DOCS,
-  sections,
   sharedControls,
+  sections,
+  formatSelectOptions,
 } from '@superset-ui/chart-controls';
 
 import { DEFAULT_FORM_DATA } from '../types';
@@ -67,10 +68,60 @@ const config: ControlPanelConfig = {
             },
           },
         ],
+        [
+          {
+            name: 'time_compare',
+            config: {
+              type: 'SelectControl',
+              multi: false,
+              freeForm: true,
+              label: t('Time shift'),
+              choices: formatSelectOptions([
+                '1 day ago',
+                '1 week ago',
+                '28 days ago',
+                '30 days ago',
+              ]),
+              description: t(
+                'Overlay one or more timeseries from a ' +
+                  'relative time period. Expects relative time deltas ' +
+                  'in natural language (example:  24 hours, 7 days, ' +
+                  '52 weeks, 365 days). Free text is supported.',
+              ),
+            },
+          },
+        ],
+        [
+          {
+            name: 'comparison_type',
+            config: {
+              type: 'SelectControl',
+              label: t('Calculation type'),
+              default: 'values',
+              choices: [[ComparisionType.Values, 'Actual values']],
+              description: t(
+                'How to display time shifts: as individual lines; as the ' +
+                  'absolute difference between the main time series and each time shift; ' +
+                  'as the percentage change; or as the ratio between series and time shifts.',
+              ),
+              visibility: () => false,
+            },
+          },
+        ],
+        [
+          {
+            name: 'is_percentage_change',
+            config: {
+              type: 'CheckboxControl',
+              label: 'Is percentage change metric',
+              default: true,
+              description:
+                'Whether the comparison of metric is percentage based or not (absolute)',
+            },
+          },
+        ],
       ],
     },
-    sections.advancedAnalyticsControls,
-    sections.titleControls,
     {
       label: t('Chart Options'),
       expanded: true,

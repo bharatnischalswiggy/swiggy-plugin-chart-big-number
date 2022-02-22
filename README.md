@@ -1,20 +1,16 @@
 ### Usage
 
 ```js
-import {
-  AnobisBigNumberChartPlugin,
-  AnobisTimeSeriesLineChart
-} from '@bharatnischal/superset-custom-chart-plugin';
+import { AnobisTimeSeriesLineChart } from '@bharatnischal/superset-custom-chart-plugin';
 
-new AnobisBigNumberChartPlugin().configure({ key: 'big-number-anobis' }).register();
-new AnobisTimeSeriesLineChart().configure({ key: 'time-series-anobis' }).register();
+new AnobisTimeSeriesLineChart().configure({ key: 'line_chart_anobis' }).register();
 ```
 
 Then use it via `SuperChart`.
 
 ```js
 <SuperChart
-  chartType="big-number-anobis"
+  chartType="line_chart_anobis"
   width={600}
   height={600}
   formData={...}

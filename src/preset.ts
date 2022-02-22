@@ -17,13 +17,13 @@
  * under the License.
  */
 import { Preset } from '@superset-ui/core';
-import BigNumberChart3Plugin from './BigNumber3';
+import { AnobisTimeSeriesLineChart } from './Echarts';
 
-export default class BigNumberChartPreset extends Preset {
+export default class AnobisChartPreset extends Preset {
   constructor() {
     super({
-      name: 'BigNumber charts',
-      plugins: [new BigNumberChart3Plugin().configure({ key: 'big_number3' })],
+      name: 'Anobis big number and line chart',
+      plugins: [new AnobisTimeSeriesLineChart().configure({ key: 'anobis_line_chart' })],
     });
   }
 }

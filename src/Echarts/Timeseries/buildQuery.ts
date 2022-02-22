@@ -19,59 +19,34 @@
 import {
   buildQueryContext,
   QueryFormData,
-  normalizeOrderBy,
-  RollingType,
   PostProcessingPivot,
 } from '@superset-ui/core';
 import {
-  rollingWindowOperator,
   timeCompareOperator,
   isValidTimeCompare,
-  sortOperator,
   pivotOperator,
-  resampleOperator,
-  contributionOperator,
-  prophetOperator,
 } from '@superset-ui/chart-controls';
 
 export default function buildQuery(formData: QueryFormData) {
   return buildQueryContext(formData, baseQueryObject => {
-    const pivotOperatorInRuntime: PostProcessingPivot | undefined =
-      pivotOperator(formData, {
-        ...baseQueryObject,
-        is_timeseries: true,
-      });
-    if (
-      pivotOperatorInRuntime &&
-      Object.values(RollingType).includes(formData.rolling_type)
-    ) {
-      pivotOperatorInRuntime.options = {
-        ...pivotOperatorInRuntime.options,
-        ...{
-          flatten_columns: false,
-          reset_index: false,
-        },
-      };
-    }
+    const pivotOperatorInRuntime:
+      | PostProcessingPivot
+      | undefined = pivotOperator(formData, {
+      ...baseQueryObject,
+      is_timeseries: true,
+    });
 
     return [
       {
         ...baseQueryObject,
         is_timeseries: true,
-        // todo: move `normalizeOrderBy to extractQueryFields`
-        orderby: normalizeOrderBy(baseQueryObject).orderby,
         time_offsets: isValidTimeCompare(formData, baseQueryObject)
-          ? formData.time_compare
+          ? [formData.time_compare]
           : [],
         post_processing: [
-          resampleOperator(formData, baseQueryObject),
           timeCompareOperator(formData, baseQueryObject),
-          sortOperator(formData, { ...baseQueryObject, is_timeseries: true }),
           // in order to be able to rolling in multiple series, must do pivot before rollingOperator
           pivotOperatorInRuntime,
-          rollingWindowOperator(formData, baseQueryObject),
-          contributionOperator(formData, baseQueryObject),
-          prophetOperator(formData, baseQueryObject),
         ],
       },
     ];

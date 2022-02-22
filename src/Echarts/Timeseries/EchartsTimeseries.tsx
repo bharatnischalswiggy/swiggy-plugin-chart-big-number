@@ -20,6 +20,7 @@ import React, { useCallback, useRef } from 'react';
 import { ViewRootGroup } from 'echarts/types/src/util/types';
 import GlobalModel from 'echarts/types/src/model/Global';
 import ComponentModel from 'echarts/types/src/model/Component';
+import { getNumberFormatter } from '@superset-ui/core';
 import { EchartsHandler, EventHandlers } from '../types';
 import Echart from '../components/Echart';
 import { TimeseriesChartTransformedProps } from './types';
@@ -40,7 +41,8 @@ export default function EchartsTimeseries({
   positiveChangeColor,
   negativeChangeColor,
   bigNumber,
-  percentageChange,
+  isPercentageChange,
+  comparisonValue,
   suffix,
 }: TimeseriesChartTransformedProps) {
   const { emitFilter, stack } = formData;
@@ -87,7 +89,7 @@ export default function EchartsTimeseries({
         model = globalModel.getComponent(modelInfo.mainType, modelInfo.index);
         break;
       }
-      el = el.parent;
+      el = (el as any).parent;
     }
     return model;
   };
@@ -106,11 +108,12 @@ export default function EchartsTimeseries({
               ? []
               : groupby.map((col, idx) => {
                   const val = groupbyValues.map(v => v[idx]);
-                  if (val === null || val === undefined)
+                  if (val === null || val === undefined) {
                     return {
                       col,
                       op: 'IS NULL',
                     };
+                  }
                   return {
                     col,
                     op: 'IN',
@@ -203,17 +206,18 @@ export default function EchartsTimeseries({
     <>
       <div>
         <p style={{ fontSize: height / 5 }}>{bigNumber}</p>
-        {percentageChange && (
+        {comparisonValue && (
           <p
             style={{
               fontSize: height / 10,
               color:
-                percentageChange > 0
-                  ? positiveChangeColor
-                  : negativeChangeColor,
+                comparisonValue > 0 ? positiveChangeColor : negativeChangeColor,
             }}
           >
-            {percentageChange.toFixed(2)}% {suffix || ''}
+            {isPercentageChange
+              ? `${comparisonValue.toFixed(2)}%`
+              : getNumberFormatter('SMART_NUMBER')(comparisonValue)}{' '}
+            {suffix}
           </p>
         )}
       </div>

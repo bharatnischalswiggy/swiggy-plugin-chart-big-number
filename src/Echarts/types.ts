@@ -122,7 +122,8 @@ export interface EChartTransformedProps<F> {
   positiveChangeColor: string;
   negativeChangeColor: string;
   bigNumber?: string;
-  percentageChange?: number;
+  comparisonValue?: number;
+  isPercentageChange: boolean;
   suffix: string;
 }
 

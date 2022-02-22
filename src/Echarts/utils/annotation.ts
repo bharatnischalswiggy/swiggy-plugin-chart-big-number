@@ -23,25 +23,25 @@ import {
   AnnotationLayer,
   AnnotationOpacity,
   AnnotationType,
-  evalExpression,
-  FormulaAnnotationLayer,
+  // evalExpression,
+//   FormulaAnnotationLayer,
   isRecordAnnotationResult,
   isTableAnnotationLayer,
   isTimeseriesAnnotationResult,
-  TimeseriesDataRecord,
+//   TimeseriesDataRecord,
 } from '@superset-ui/core';
 
-export function evalFormula(
-  formula: FormulaAnnotationLayer,
-  data: TimeseriesDataRecord[],
-): [Date, number][] {
-  const { value: expression } = formula;
+// export function evalFormula(
+//   formula: FormulaAnnotationLayer,
+//   data: TimeseriesDataRecord[],
+// ): [Date, number][] {
+//   const { value: expression } = formula;
 
-  return data.map(row => [
-    new Date(Number(row.__timestamp)),
-    evalExpression(expression, row.__timestamp as number),
-  ]);
-}
+//   return data.map(row => [
+//     new Date(Number(row.__timestamp)),
+//     evalExpression(expression, row.__timestamp as number),
+//   ]);
+// }
 
 export function parseAnnotationOpacity(opacity?: AnnotationOpacity): number {
   switch (opacity) {

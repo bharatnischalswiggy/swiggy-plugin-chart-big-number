@@ -44,7 +44,7 @@ const lineTransformProps = (chartProps: EchartsTimeseriesChartProps) =>
     },
   });
 
-export default class EchartsTimeseriesLineChartPlugin extends ChartPlugin<
+export default class AnobisTimeSeriesLineChart extends ChartPlugin<
   EchartsTimeseriesFormData,
   EchartsTimeseriesChartProps
 > {
@@ -57,9 +57,7 @@ export default class EchartsTimeseriesLineChartPlugin extends ChartPlugin<
         behaviors: [Behavior.INTERACTIVE_CHART],
         category: 'Swiggy',
         credits: ['https://echarts.apache.org'],
-        description: t(
-          'Time-series line chart is used to visualize repeated measurements taken over regular time intervals. Line chart is a type of chart which displays information as a series of data points connected by straight line segments. It is a basic type of chart common in many fields.',
-        ),
+        description: 'Big number chart with comparison with previous trends',
         exampleGallery: [{ url: example1 }, { url: example2 }],
         supportedAnnotationTypes: [
           AnnotationType.Event,
