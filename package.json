@@ -1,6 +1,6 @@
 {
   "name": "@bharatnischal/superset-custom-chart-plugin",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Custom Superset Chart plugin",
   "sideEffects": [
     "*.css"
@@ -37,9 +37,16 @@
     "d3-array": "^1.2.0",
     "echarts": "^5.1.2",
     "lodash": "^4.17.15",
-    "mathjs": "^8.0.1"
+    "mathjs": "^8.0.1",
+    "@superset-ui/react-pivottable": "^0.12.12"
   },
   "peerDependencies": {
-    "react": "^16.13.1"
+    "react": "^16 || ^17",
+    "@ant-design/icons": "^4.2.2"
+  },
+  "devDependencies": {
+    "@babel/types": "^7.13.12",
+    "@types/jest": "^26.0.0",
+    "jest": "^26.0.1"
   }
 }
