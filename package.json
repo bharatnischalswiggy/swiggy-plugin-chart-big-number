@@ -1,6 +1,6 @@
 {
   "name": "@bharatnischal/superset-custom-chart-plugin",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Custom Superset Chart plugin",
   "sideEffects": [
     "*.css"
