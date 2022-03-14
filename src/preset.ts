@@ -18,12 +18,18 @@
  */
 import { Preset } from '@superset-ui/core';
 import { AnobisTimeSeriesLineChart } from './Echarts';
+import { SwiggyPivotTableChartPlugin } from './PivotTable';
 
 export default class AnobisChartPreset extends Preset {
   constructor() {
     super({
       name: 'Anobis big number and line chart',
-      plugins: [new AnobisTimeSeriesLineChart().configure({ key: 'anobis_line_chart' })],
+      plugins: [
+        new AnobisTimeSeriesLineChart().configure({ key: 'anobis_line_chart' }),
+        new SwiggyPivotTableChartPlugin().configure({
+          key: 'swiggy_pivot_table',
+        }),
+      ],
     });
   }
 }
