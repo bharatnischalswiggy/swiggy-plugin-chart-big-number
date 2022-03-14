@@ -111,10 +111,16 @@ export default function transformProps(chartProps: ChartProps<QueryFormData>) {
   const { selectedFilters } = filterState;
   const granularity = extractTimegrain(rawFormData);
 
-  // New Addition
+  const metricLabels = metrics.map((metric: any) => {
+    if (typeof metric === 'string') {
+      return metric;
+    }
+    return metric?.label || '';
+  });
   const newGroupByColumns = colnames.filter(
-    (col: string, ind: number) => !groupbyRows.includes(col) && coltypes[ind],
+    (col: string) => !groupbyRows.includes(col) && !metricLabels.includes(col),
   );
+  // ADDITION-END
 
   const dateFormatters = colnames
     .filter(
