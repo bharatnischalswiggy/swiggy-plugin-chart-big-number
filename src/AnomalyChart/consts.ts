@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,8 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import { formatSelectOptions } from '@superset-ui/chart-controls';
+import { addLocaleData, t } from '@superset-ui/core';
+import i18n from './i18n';
 
-export * from './Echarts';
-export * from './PivotTable';
-export { default as AnomalyChartPlugin } from './AnomalyChart';
-export { default as AnobisChartPreset } from './preset';
+addLocaleData(i18n);
+
+export const PAGE_SIZE_OPTIONS = formatSelectOptions<number>([
+  [0, t('page_size.all')],
+  10,
+  20,
+  50,
+  100,
+  200,
+]);

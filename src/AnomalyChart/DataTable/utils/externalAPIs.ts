@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -17,7 +17,16 @@
  * under the License.
  */
 
-export * from './Echarts';
-export * from './PivotTable';
-export { default as AnomalyChartPlugin } from './AnomalyChart';
-export { default as AnobisChartPreset } from './preset';
+import { SetDataMaskHook } from '@superset-ui/core';
+
+export const updateExternalFormData = (
+  setDataMask: SetDataMaskHook = () => {},
+  pageNumber: number,
+  pageSize: number,
+) =>
+  setDataMask({
+    ownState: {
+      currentPage: pageNumber,
+      pageSize,
+    },
+  });

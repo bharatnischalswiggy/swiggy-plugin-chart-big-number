@@ -1,4 +1,4 @@
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -16,8 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+export * from './hooks/useSticky';
+export * from './components/GlobalFilter';
+export * from './components/Pagination';
+export * from './components/SelectPageSize';
+export * from './DataTable';
 
-export * from './Echarts';
-export * from './PivotTable';
-export { default as AnomalyChartPlugin } from './AnomalyChart';
-export { default as AnobisChartPreset } from './preset';
+export { default } from './DataTable';

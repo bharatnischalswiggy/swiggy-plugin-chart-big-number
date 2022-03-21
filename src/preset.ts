@@ -19,6 +19,7 @@
 import { Preset } from '@superset-ui/core';
 import { AnobisTimeSeriesLineChart } from './Echarts';
 import { SwiggyPivotTableChartPlugin } from './PivotTable';
+import AnomalyChartPlugin from './AnomalyChart';
 
 export default class AnobisChartPreset extends Preset {
   constructor() {
@@ -28,6 +29,9 @@ export default class AnobisChartPreset extends Preset {
         new AnobisTimeSeriesLineChart().configure({ key: 'anobis_line_chart' }),
         new SwiggyPivotTableChartPlugin().configure({
           key: 'swiggy_pivot_table',
+        }),
+        new AnomalyChartPlugin().configure({
+          key: 'swiggy_anomaly_chart',
         }),
       ],
     });
