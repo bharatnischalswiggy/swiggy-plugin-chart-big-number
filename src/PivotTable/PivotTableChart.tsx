@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,7 +17,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { PlusSquareOutlined, MinusSquareOutlined } from '@ant-design/icons';
 import {
   styled,
@@ -134,8 +135,8 @@ export default function PivotTableChart(props: PivotTableProps) {
     metricColorFormatters,
     dateFormatters,
     // ADDITION
-    setControlValue,
     availableGroupbyColumns,
+    selectedMetric,
     // ADDITION-END
   } = props;
 
@@ -154,10 +155,10 @@ export default function PivotTableChart(props: PivotTableProps) {
 
   const metricNames = useMemo(
     () =>
-      metrics.map((metric: string | AdhocMetric) =>
+      selectedMetric.map((metric: string | AdhocMetric) =>
         typeof metric === 'string' ? metric : (metric.label as string),
       ),
-    [metrics],
+    [selectedMetric],
   );
 
   const unpivotedData = useMemo(
@@ -187,6 +188,11 @@ export default function PivotTableChart(props: PivotTableProps) {
   } else {
     cols = combineMetric ? [...cols, METRIC_KEY] : [METRIC_KEY, ...cols];
   }
+
+  const [queryConfig, setQueryConfig] = useState({
+    selectedColumns: groupbyColumns,
+    selectedMetric: selectedMetric[0],
+  });
 
   const handleChange = useCallback(
     (filters: SelectedFiltersType) => {
@@ -277,32 +283,60 @@ export default function PivotTableChart(props: PivotTableProps) {
   );
 
   // ADDITION
-  const handleChangeColumn = (value: string) => {
+  useEffect(() => {
+    // Refetch chart data
     setDataMask({
-      ownState: {
-        selectedColumns: value,
-      },
+      ownState: queryConfig,
     });
-    setControlValue('groupbyColumns', value);
+  }, [queryConfig, setDataMask]);
+
+  const handleChangeColumn = (value: string[]) => {
+    setQueryConfig(prev => ({
+      ...prev,
+      selectedColumns: value,
+    }));
   };
+
+  const handleChangeMetric = (value: string) =>
+    setQueryConfig(prev => ({
+      ...prev,
+      selectedMetric: value,
+    }));
   // ADDITION-END
 
   return (
     <Styles height={height} width={width} margin={theme.gridUnit * 4}>
       {/* ADDITION */}
       <SelectWrapper>
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-        <label>Column name</label>
-        <Select
-          defaultValue={groupbyColumns as any}
-          onChange={handleChangeColumn}
-          placeholder="Please choose a column"
-          mode="tags"
-        >
-          {availableGroupbyColumns.map(column => (
-            <option value={column}>{column}</option>
-          ))}
-        </Select>
+        {availableGroupbyColumns?.length > 0 && (
+          <>
+            <label>Column name</label>
+            <Select
+              defaultValue={groupbyColumns as any}
+              onChange={handleChangeColumn}
+              placeholder="Please choose a column"
+              mode="tags"
+            >
+              {availableGroupbyColumns.map(column => (
+                <option value={column}>{column}</option>
+              ))}
+            </Select>
+          </>
+        )}
+
+        {metrics?.length > 1 && (
+          <>
+            <label>Metric name</label>
+            <Select
+              defaultValue={selectedMetric[0]}
+              onChange={handleChangeMetric}
+            >
+              {metrics.map(column => (
+                <option value={column}>{column}</option>
+              ))}
+            </Select>
+          </>
+        )}
       </SelectWrapper>
       {/* // ADDITION-END */}
       <PivotTable

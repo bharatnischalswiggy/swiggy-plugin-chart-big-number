@@ -17,6 +17,7 @@
  * under the License.
  */
 import {
+  AdhocMetric,
   ChartProps,
   DataRecord,
   extractTimegrain,
@@ -41,6 +42,15 @@ function isNumeric(key: string, data: DataRecord[] = []) {
       typeof record[key] === 'number',
   );
 }
+
+// ADDITION
+function getMetricName(metric: string | AdhocMetric) {
+  if (typeof metric === 'string') {
+    return metric;
+  }
+  return metric?.label || '';
+}
+// ADDITION-END
 
 export default function transformProps(chartProps: ChartProps<QueryFormData>) {
   /**
@@ -78,16 +88,16 @@ export default function transformProps(chartProps: ChartProps<QueryFormData>) {
     queriesData,
     formData,
     rawFormData,
-    // ADDITION
-    hooks: { setDataMask = () => {}, setControlValue = () => {} },
-    // ADDITION-END
+    hooks: { setDataMask = () => {} },
     filterState,
     datasource: { verboseMap = {}, columnFormats = {} },
   } = chartProps;
   const { data, colnames, coltypes } = queriesData[0];
   const {
     groupbyRows,
-    groupbyColumns,
+    // REMOVED
+    // groupbyColumns,
+    // REMOVED-END
     metrics,
     tableRenderer,
     colOrder,
@@ -111,12 +121,17 @@ export default function transformProps(chartProps: ChartProps<QueryFormData>) {
   const { selectedFilters } = filterState;
   const granularity = extractTimegrain(rawFormData);
 
-  const metricLabels = metrics.map((metric: any) => {
-    if (typeof metric === 'string') {
-      return metric;
-    }
-    return metric?.label || '';
-  });
+  // ADDITION
+  const metricLabels = metrics.map(getMetricName);
+
+  const selectedMetric = colnames.filter((col: string) =>
+    metricLabels.includes(col),
+  );
+
+  if (selectedMetric.length === 0) {
+    selectedMetric.push(getMetricName(metrics[0]));
+  }
+
   const newGroupByColumns = colnames.filter(
     (col: string) => !groupbyRows.includes(col) && !metricLabels.includes(col),
   );
@@ -161,7 +176,7 @@ export default function transformProps(chartProps: ChartProps<QueryFormData>) {
     data,
     groupbyRows,
     groupbyColumns: newGroupByColumns,
-    metrics,
+    metrics: metrics.map(getMetricName),
     tableRenderer,
     colOrder,
     rowOrder,
@@ -182,8 +197,8 @@ export default function transformProps(chartProps: ChartProps<QueryFormData>) {
     metricColorFormatters,
     dateFormatters,
     // ADDITION
-    setControlValue,
     availableGroupbyColumns,
+    selectedMetric,
     // ADDITION-END
   };
 }

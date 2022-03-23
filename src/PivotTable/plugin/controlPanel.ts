@@ -54,8 +54,11 @@ const config: ControlPanelConfig = {
             name: 'groupbyColumns',
             config: {
               ...sharedControls.groupby,
-              label: t('Columns'),
-              description: t('Columns to group by on the columns'),
+              // UPDATION
+              label: 'Default Column',
+              description:
+                'Column to use when no other column is selected in dropdown',
+              // UPDATION-END
             },
           },
         ],
@@ -90,6 +93,10 @@ const config: ControlPanelConfig = {
             name: 'metrics',
             config: {
               ...sharedControls.metrics,
+              // UPDATION
+              label: 'Available Metrics',
+              description: 'List of metrices available in chart dropdown',
+              // UPDATION-END
               validators: [validateNonEmpty],
             },
           },
@@ -122,20 +129,22 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        ['timeseries_limit_metric'],
-        [
-          {
-            name: 'order_desc',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Sort descending'),
-              default: true,
-              description: t(
-                'Whether to sort descending or ascending. Takes effect only when "Sort by" is set',
-              ),
-            },
-          },
-        ],
+        // REMOVED
+        // ['timeseries_limit_metric'],
+        // [
+        //   {
+        //     name: 'order_desc',
+        //     config: {
+        //       type: 'CheckboxControl',
+        //       label: t('Sort descending'),
+        //       default: true,
+        //       description: t(
+        //         'Whether to sort descending or ascending. Takes effect only when "Sort by" is set',
+        //       ),
+        //     },
+        //   },
+        // ],
+        // REMOVED-END
       ],
     },
     {

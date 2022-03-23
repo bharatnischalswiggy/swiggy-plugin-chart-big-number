@@ -438,6 +438,7 @@ const config: ControlPanelConfig = {
                 queryMode: getQueryMode(controls),
                 externalValidationErrors:
                   isRawMode({ controls }) &&
+                  !!controls.custom_modal.value &&
                   ensureIsArray(controlState.value).length === 0
                     ? [t('must have a value')]
                     : [],

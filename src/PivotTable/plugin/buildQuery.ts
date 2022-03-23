@@ -17,6 +17,7 @@
  * under the License.
  */
 import {
+  AdhocMetric,
   buildQueryContext,
   ensureIsArray,
   getMetricLabel,
@@ -50,7 +51,19 @@ export default function buildQuery(
   ]);
   return buildQueryContext(formData, baseQueryObject => {
     const queryObject = normalizeOrderBy({ ...baseQueryObject, order_desc });
-    const { metrics } = queryObject;
+    // ADDITION
+    let { metrics = [] } = queryObject;
+    if (ownState?.selectedMetric) {
+      metrics = metrics.filter((metric: string | AdhocMetric) => {
+        if (typeof metric === 'string') {
+          return metric === ownState.selectedMetric;
+        }
+        return metric.label === ownState.selectedMetric;
+      });
+    } else {
+      metrics = [metrics[0]];
+    }
+    // ADDITION-END
     const orderBy = ensureIsArray(timeseries_limit_metric);
     if (
       orderBy.length &&

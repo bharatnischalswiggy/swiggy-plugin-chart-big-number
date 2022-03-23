@@ -19,7 +19,6 @@
 import {
   QueryFormData,
   DataRecord,
-  AdhocMetric,
   SetDataMaskHook,
   DataRecordValue,
   JsonObject,
@@ -50,7 +49,9 @@ export enum MetricsLayoutEnum {
 interface PivotTableCustomizeProps {
   groupbyRows: string[];
   groupbyColumns: string[];
-  metrics: (string | AdhocMetric)[];
+  // UPDATED
+  metrics: string[];
+  // UPDATED-END
   tableRenderer: string;
   colOrder: string;
   rowOrder: string;
@@ -63,7 +64,6 @@ interface PivotTableCustomizeProps {
   rowTotals: boolean;
   valueFormat: string;
   setDataMask: SetDataMaskHook;
-  setControlValue: any;
   emitFilter?: boolean;
   selectedFilters?: SelectedFiltersType;
   verboseMap: JsonObject;
@@ -73,7 +73,10 @@ interface PivotTableCustomizeProps {
   dateFormatters: Record<string, DateFormatter | undefined>;
   timeseries_limit_metric: QueryFormMetric[] | QueryFormMetric | null;
   order_desc: boolean;
+  // ADDITION
   availableGroupbyColumns: string[];
+  selectedMetric: string[];
+  // ADDITION-END
 }
 
 export type PivotTableQueryFormData = QueryFormData &
@@ -87,6 +90,6 @@ export type PivotTableProps = PivotTableStylesProps &
 
 // ADDITION
 export interface Options {
-  ownState: { selectedColumns: string[] };
+  ownState: { selectedColumns: string[]; selectedMetric?: string };
 }
 // ADDITION-END
