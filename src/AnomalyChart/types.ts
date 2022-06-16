@@ -111,10 +111,16 @@ export interface TableChartTransformedProps<D extends DataRecord = DataRecord> {
   columnColorFormatters?: ColorFormatters;
   autoSelectFirstColumn: boolean;
   // ADDITION
-  customModal: boolean;
-  requestMethod: string;
-  requestUrl: string;
+  feedback: boolean;
+  annotationLayerNumber: string | number;
   primaryId: string;
+  timeCol: string;
+  emitTimeRange: boolean;
+  emitTimeRangeStart: string;
+  feedbackPageSize: string;
+  selectionText: string;
+  firstColClick: boolean;
+  dashboardNativeFilters: any;
   // ADDITION-END
 }
 

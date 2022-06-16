@@ -1,3 +1,4 @@
+/* eslint-disable radix */
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,7 +22,6 @@ import React, {
   useCallback,
   useMemo,
   useRef,
-  useEffect,
   useState,
 } from 'react';
 import {
@@ -44,6 +44,11 @@ import {
   tn,
 } from '@superset-ui/core';
 
+// eslint-disable-next-line no-restricted-imports
+import { message as alert } from 'antd';
+// ADDITION
+import useDeepCompareEffect from 'use-deep-compare-effect';
+// ADDITION-END
 import { DataColumnMeta, TableChartTransformedProps } from './types';
 import DataTable, {
   DataTableProps,
@@ -58,6 +63,7 @@ import { PAGE_SIZE_OPTIONS } from './consts';
 import { updateExternalFormData } from './DataTable/utils/externalAPIs';
 // ADDITION
 import MessageModal from './MessageModal';
+import FeedbackBar from './FeedbackBar';
 // ADDITION-END
 
 type ValueRange = [number, number];
@@ -198,12 +204,18 @@ export default function TableChart<D extends DataRecord = DataRecord>(
     filters,
     sticky = true, // whether to use sticky header
     columnColorFormatters,
-    autoSelectFirstColumn,
     // ADDITION
-    customModal,
-    requestMethod,
-    requestUrl,
+    autoSelectFirstColumn,
+    feedback,
+    annotationLayerNumber,
     primaryId,
+    timeCol,
+    emitTimeRange,
+    emitTimeRangeStart,
+    feedbackPageSize,
+    selectionText,
+    firstColClick,
+    dashboardNativeFilters,
     // ADDITION-END
   } = props;
   const timestampFormatter = useCallback(
@@ -213,11 +225,15 @@ export default function TableChart<D extends DataRecord = DataRecord>(
 
   // ADDITION
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [id, setId] = useState();
+  const [id, setId] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [viewFeedbackId, setViewFeedbackId] = useState('');
 
   const wrapper = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useDeepCompareEffect(() => {
+    document.querySelector('.active-row')?.classList.remove('active-row');
+    setId('');
     if (autoSelectFirstColumn && wrapper.current) {
       setTimeout(() => {
         const firstField = wrapper.current?.querySelector(
@@ -226,11 +242,13 @@ export default function TableChart<D extends DataRecord = DataRecord>(
         firstField?.click();
       }, 0);
     }
-  }, [autoSelectFirstColumn]);
+  }, [dashboardNativeFilters, autoSelectFirstColumn]);
   // ADDITION-END
 
   const handleChange = useCallback(
-    (filters: { [x: string]: DataRecordValue[] }) => {
+    // UPDATION
+    (filters: { [x: string]: DataRecordValue[] }, timeRange: string) => {
+      // UPDATION-END
       if (!emitFilter) {
         return;
       }
@@ -270,6 +288,9 @@ export default function TableChart<D extends DataRecord = DataRecord>(
                     grain: col === DTTM_ALIAS ? timeGrain : undefined,
                   };
                 }),
+          // ADDITION
+          ...(emitTimeRange ? { time_range: timeRange } : undefined),
+          // ADDITION-END
         },
         filterState: {
           label: labelElements.join(', '),
@@ -315,25 +336,52 @@ export default function TableChart<D extends DataRecord = DataRecord>(
   }
 
   const toggleFilter = useCallback(
-    function toggleFilter(key: string, val: DataRecordValue) {
-      let updatedFilters = { ...(filters || {}) };
-      const target = getEmitTarget(key);
-      if (filters && isActiveFilterValue(target, val)) {
-        updatedFilters = {};
-      } else {
-        updatedFilters = {
-          [target]: [val],
-        };
+    // UPDATION
+    function toggleFilter(key: string, val: DataRecordValue, row: any = {}) {
+      if (firstColClick && key !== primaryId) {
+        toggleFilter(primaryId, row[primaryId], row);
+        return;
       }
+      let timeRange = ' : ';
+      let updatedFilters = { ...(filters || {}) };
+      if (emitTimeRange) {
+        const emitEndTime = new Date(row[timeCol].getTime());
+        emitEndTime.setDate(emitEndTime.getDate() + 1);
+        const emitStartTime = new Date(emitEndTime);
+        emitStartTime.setDate(
+          emitStartTime.getDate() - parseInt(emitTimeRangeStart),
+        );
+        timeRange = `${emitStartTime
+          .toISOString()
+          .substring(0, 10)} : ${emitEndTime.toISOString().substring(0, 10)}`;
+      }
+      // UPDATION-END
+      const target = getEmitTarget(key);
+      // if (filters && isActiveFilterValue(target, val)) {
+      //   updatedFilters = {};
+      // } else {
+      updatedFilters = {
+        [target]: [val],
+      };
+      // }
       if (
         Array.isArray(updatedFilters[target]) &&
         updatedFilters[target].length === 0
       ) {
         delete updatedFilters[target];
       }
-      handleChange(updatedFilters);
+      // UPDATION
+      handleChange(updatedFilters, timeRange);
+      // UPDATION-END
     },
-    [filters, handleChange, isActiveFilterValue],
+    [
+      filters,
+      handleChange,
+      isActiveFilterValue,
+      emitTimeRange,
+      emitTimeRangeStart,
+      timeCol,
+    ],
   );
 
   const getSharedStyle = (column: DataColumnMeta): CSSProperties => {
@@ -392,7 +440,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
         // typing is incorrect in current version of `@types/react-table`
         // so we ask TS not to check.
         accessor: ((datum: D) => datum[key]) as never,
-        Cell: ({ value }: { value: DataRecordValue }) => {
+        Cell: ({ value, cell }) => {
           const [isHtml, text] = formatColumnValue(column, value);
           const html = isHtml ? { __html: text } : undefined;
 
@@ -415,7 +463,11 @@ export default function TableChart<D extends DataRecord = DataRecord>(
             title: typeof value === 'number' ? String(value) : undefined,
             onClick:
               emitFilter && !valueRange
-                ? () => toggleFilter(key, value)
+                ? () => {
+                    // UPDATION
+                    toggleFilter(key, value, cell?.row?.original);
+                    // UPDATION-END
+                  }
                 : undefined,
             className: [
               className,
@@ -500,12 +552,12 @@ export default function TableChart<D extends DataRecord = DataRecord>(
   const columns = useMemo(() => {
     const newCols = columnsMeta;
     if (
-      customModal &&
-      newCols.findIndex(({ key }) => key === 'request_body') === -1
+      feedback &&
+      newCols.findIndex(({ key }) => key === 'view_feedback') === -1
     ) {
       newCols.push({
-        key: 'request_body',
-        label: 'Request Body',
+        key: 'view_feedback',
+        label: 'View Feedback',
         isNumeric: false,
         dataType: columnsMeta.length + 1,
         isMetric: false,
@@ -514,8 +566,8 @@ export default function TableChart<D extends DataRecord = DataRecord>(
         config: {},
       });
     } else if (
-      !customModal &&
-      newCols.findIndex(({ key }) => key === 'request_body') !== -1
+      !feedback &&
+      newCols.findIndex(({ key }) => key === 'view_feedback') !== -1
     ) {
       newCols.pop();
     }
@@ -532,15 +584,15 @@ export default function TableChart<D extends DataRecord = DataRecord>(
 
   // ADDITION
   let tableData = data;
-  if (customModal) {
+  if (feedback) {
     tableData = data.map((row: any) => {
       // eslint-disable-next-line no-param-reassign
-      row.request_body = {
+      row.view_feedback = {
         key: 'button',
-        label: 'Send message',
-        handleClick: () => {
+        handleClick: (e: React.MouseEvent) => {
+          e.stopPropagation();
+          setViewFeedbackId(String(row[primaryId]));
           setIsModalOpen(true);
-          setId(row[primaryId]);
         },
       };
 
@@ -550,28 +602,39 @@ export default function TableChart<D extends DataRecord = DataRecord>(
 
   const hideModal = () => setIsModalOpen(false);
 
-  const sendData = (status: string, message: string) => {
+  const sendData = (data: { label: string; comment: string }) => {
     const myHeaders = new Headers();
     myHeaders.append('Content-Type', 'application/json');
 
     const requestOptions = {
-      method: requestMethod || 'POST',
+      method: 'POST',
       headers: myHeaders,
       body: JSON.stringify({
-        id,
-        status,
-        message,
+        end_dttm: startTime,
+        json_metadata: JSON.stringify(data),
+        short_descr: `${id}_${Date.now()}`,
+        start_dttm: startTime,
+        long_descr: '',
       }),
     };
 
-    const url = requestUrl.replaceAll('[id]', String(id));
+    const url = `/api/v1/annotation_layer/${annotationLayerNumber}/annotation/`;
     fetch(url, requestOptions)
       .then(response => response.text())
-      .then(result => {
-        hideModal();
+      .then(() => {
+        alert.success('Saved successfully');
       })
-      .catch(error => console.error(error));
+      .catch(() => {
+        alert.error('Something went wrong');
+      });
   };
+
+  function handleRowClick(row: any) {
+    if (feedback) {
+      setId(String(row.original[primaryId]));
+      setStartTime(row.original[timeCol]);
+    }
+  }
   // ADDITION-END
 
   return (
@@ -580,9 +643,17 @@ export default function TableChart<D extends DataRecord = DataRecord>(
       <MessageModal
         isOpen={isModalOpen}
         hide={hideModal}
-        submit={sendData}
-        primaryId={id}
+        primaryId={viewFeedbackId}
+        annotationLayerNumber={annotationLayerNumber}
+        pageSize={feedbackPageSize}
       />
+      {feedback && (
+        <FeedbackBar
+          selectionText={selectionText}
+          id={id}
+          sendData={sendData}
+        />
+      )}
       {/* ADDITION-END */}
       <Styles>
         <DataTable<D>
@@ -608,6 +679,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
           sticky={sticky}
           // ADDITION
           wrapperRef={wrapper as any}
+          handleRowClick={handleRowClick}
           // ADDITION-END
         />
       </Styles>

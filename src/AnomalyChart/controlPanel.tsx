@@ -171,10 +171,6 @@ const dnd_percent_metrics = {
   type: 'DndMetricSelect',
 };
 
-// ADDITION
-const METHOD_VERBS = ['POST', 'PUT', 'DELETE'];
-// ADDITION-END
-
 const config: ControlPanelConfig = {
   controlPanelSections: [
     sections.legacyTimeseriesTime,
@@ -377,16 +373,16 @@ const config: ControlPanelConfig = {
               default: false,
               label: 'Auto select first cell to emit cross filter',
               visibility: ({ controls }) =>
-                Boolean(controls?.emit_filter.value),
+                Boolean(controls?.emit_filter?.value),
             },
           },
         ],
         [
           {
-            name: 'custom_modal',
+            name: 'feedback',
             config: {
               type: 'CheckboxControl',
-              label: 'Add post api column',
+              label: 'Add Feedback Header',
               description: '',
               default: false,
               visibility: isRawMode,
@@ -395,27 +391,24 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'request_method',
+            name: 'first_col_click',
             config: {
-              type: 'SelectControl',
-              freeForm: true,
-              label: 'Http verb',
-              default: 'POST',
-              choices: METHOD_VERBS,
+              type: 'CheckboxControl',
+              label: 'Enable click only on primary column',
               description: '',
-              visibility: ({ controls }) => !!controls.custom_modal.value,
+              default: false,
             },
           },
         ],
         [
           {
-            name: 'request_url',
+            name: 'annotation_layer_number',
             config: {
               type: 'TextControl',
-              label: 'Request Url',
+              label: 'Annotation Layer Number',
               description:
                 'The url to which request will be sent. You can use [id] in url which will be replaced by the primary id you have selected',
-              visibility: ({ controls }) => !!controls.custom_modal.value,
+              visibility: ({ controls }) => !!controls.feedback.value,
             },
           },
         ],
@@ -424,21 +417,20 @@ const config: ControlPanelConfig = {
             name: 'primary_id',
             config: {
               type: 'SelectControl',
-              label: 'primary id',
-              description:
-                'Column whose data will be sent along with custom data',
+              label: 'primary key column',
+              description: 'Column used to uniquely itentify an anomaly',
               multi: false,
               freeForm: true,
               default: '',
-              optionRenderer: c => <ColumnOption showType column={c} />,
-              valueRenderer: c => <ColumnOption column={c} />,
+              required: true,
+              optionRenderer: (c: any) => <ColumnOption showType column={c} />,
+              valueRenderer: (c: any) => <ColumnOption column={c} />,
               valueKey: 'column_name',
               mapStateToProps: ({ datasource, controls }, controlState) => ({
                 options: datasource?.columns || [],
                 queryMode: getQueryMode(controls),
                 externalValidationErrors:
-                  isRawMode({ controls }) &&
-                  !!controls.custom_modal.value &&
+                  !!controls.feedback.value &&
                   ensureIsArray(controlState.value).length === 0
                     ? [t('must have a value')]
                     : [],
@@ -446,7 +438,84 @@ const config: ControlPanelConfig = {
 
               sortComparator: (a: { label: string }, b: { label: string }) =>
                 a.label.localeCompare(b.label),
-              visibility: ({ controls }) => !!controls.custom_modal.value,
+              visibility: ({ controls }) => !!controls.feedback.value,
+            },
+          },
+        ],
+        [
+          {
+            name: 'time_col',
+            config: {
+              type: 'SelectControl',
+              label: 'Time column for annotation',
+              description: '',
+              clearable: false,
+              optionRenderer: (c: any) => <ColumnOption column={c} showType />,
+              valueRenderer: (c: any) => <ColumnOption column={c} />,
+              valueKey: 'column_name',
+              mapStateToProps: (state, controlState) => {
+                const props: any = {};
+                if (state.datasource) {
+                  props.choices = state.datasource.granularity_sqla;
+                  props.default = null;
+                  props.externalValidationErrors =
+                    !!state.controls.feedback.value &&
+                    ensureIsArray(controlState.value).length === 0
+                      ? [t('must have a value')]
+                      : [];
+                }
+                return props;
+              },
+              visibility: ({ controls }) => !!controls.feedback.value,
+            },
+          },
+        ],
+        [
+          {
+            name: 'emit_time_range',
+            config: {
+              type: 'CheckboxControl',
+              description: 'Should emit time range based filter on click',
+              default: false,
+              label: 'Should emit time range based filter on click',
+              visibility: ({ controls }) =>
+                Boolean(controls?.emit_filter?.value),
+            },
+          },
+        ],
+        [
+          {
+            name: 'emit_time_range_start',
+            config: {
+              type: 'TextControl',
+              label: 'Number of days to show before anomaly',
+              description: '',
+              default: 28,
+              visibility: ({ controls }) => !!controls?.emit_time_range.value,
+            },
+          },
+        ],
+        [
+          {
+            name: 'feedback_page_size',
+            config: {
+              type: 'TextControl',
+              label: 'Feedback page size',
+              description: '',
+              default: 5,
+              visibility: ({ controls }) => !!controls.feedback.value,
+            },
+          },
+        ],
+        [
+          {
+            name: 'selection_text',
+            config: {
+              type: 'TextControl',
+              label: 'Primay key selection text on header',
+              description: '',
+              default: 'Primary key Selected:',
+              visibility: ({ controls }) => !!controls.feedback.value,
             },
           },
         ],

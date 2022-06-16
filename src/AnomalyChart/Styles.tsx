@@ -78,4 +78,27 @@ export default styled.div`
     text-align: center;
     padding: 1em 0.6em;
   }
+
+  tr {
+    cursor: pointer;
+  }
+
+  tr.active-row {
+    background-color: #e4e4e4 !important;
+  }
+`;
+
+export const Feedback = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 25px;
+
+  p {
+    margin: 0;
+  }
+
+  .primary-id {
+    transition: content 2s linear;
+  }
 `;

@@ -1,52 +1,53 @@
 {
   "name": "@bharatnischal/superset-custom-chart-plugin",
-  "version": "1.0.14",
+  "version": "1.0.17",
   "description": "Custom Superset Chart plugin",
+  "keywords": [
+    "superset"
+  ],
+  "homepage": "https://github.com/bharatnischalswiggy/swiggy-plugin-chart-big-number#readme",
+  "bugs": {
+    "url": "https://github.com/bharatnischalswiggy/swiggy-plugin-chart-big-number/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bharatnischalswiggy/swiggy-plugin-chart-big-number.git"
+  },
+  "license": "Apache-2.0",
+  "author": "Bharat Nischal",
   "sideEffects": [
     "*.css"
   ],
-  "scripts": {
-    "build": "webpack --mode production"
-  },
   "main": "lib/index.js",
   "module": "esm/index.js",
   "files": [
     "esm",
     "lib"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/bharatnischalswiggy/swiggy-plugin-chart-big-number.git"
-  },
-  "keywords": [
-    "superset"
-  ],
-  "author": "Bharat Nischal",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/bharatnischalswiggy/swiggy-plugin-chart-big-number/issues"
-  },
-  "homepage": "https://github.com/bharatnischalswiggy/swiggy-plugin-chart-big-number#readme",
-  "publishConfig": {
-    "access": "public"
+  "scripts": {
+    "build": "webpack --mode production"
   },
   "dependencies": {
     "@superset-ui/chart-controls": "0.17.84",
     "@superset-ui/core": "0.17.81",
+    "@superset-ui/react-pivottable": "^0.12.12",
     "@types/mathjs": "^6.0.7",
     "d3-array": "^1.2.0",
     "echarts": "^5.1.2",
     "lodash": "^4.17.15",
     "mathjs": "^8.0.1",
-    "@superset-ui/react-pivottable": "^0.12.12"
-  },
-  "peerDependencies": {
-    "react": "^16 || ^17",
-    "@ant-design/icons": "^4.2.2"
+    "use-deep-compare-effect": "^1.8.1"
   },
   "devDependencies": {
     "@babel/types": "^7.13.12",
     "@types/jest": "^26.0.0",
     "jest": "^26.0.1"
+  },
+  "peerDependencies": {
+    "@ant-design/icons": "^4.2.2",
+    "react": "^16 || ^17"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

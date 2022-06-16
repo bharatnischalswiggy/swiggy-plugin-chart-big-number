@@ -37,10 +37,10 @@ import {
 } from 'react-table';
 import { matchSorter, rankings } from 'match-sorter';
 // ADDITION
-import Button from 'src/components/Button';
+import { EyeFilled } from '@ant-design/icons';
 // ADDITION-END
 import GlobalFilter, { GlobalFilterProps } from './components/GlobalFilter';
-import SelectPageSize, { SelectPageSizeProps, SizeOption } from './components/SelectPageSize';
+import { SelectPageSizeProps, SizeOption } from './components/SelectPageSize';
 import SimplePagination from './components/Pagination';
 import useSticky from './hooks/useSticky';
 import { PAGE_SIZE_OPTIONS } from '../consts';
@@ -84,11 +84,16 @@ export default function DataTable<D extends object>({
   searchInput = true,
   onServerPaginationChange,
   rowCount,
-  selectPageSize,
+  // REMOVED
+  // selectPageSize,
+  // REMOVED-END
   noResults: noResultsText = 'No data found',
   hooks,
   serverPagination,
   wrapperRef: userWrapperRef,
+  //  ADDITION
+  handleRowClick,
+  //  ADDITION-END
   ...moreUseTableOptions
 }: DataTableProps<D>): JSX.Element {
   const tableHooks: PluginHook<D>[] = [
@@ -143,7 +148,8 @@ export default function DataTable<D extends object>({
   const defaultGlobalFilter: FilterType<D> = useCallback(
     (rows: Row<D>[], columnIds: IdType<D>[], filterValue: string) => {
       // allow searching by "col1_value col2_value"
-      const joinedString = (row: Row<D>) => columnIds.map(x => row.values[x]).join(' ');
+      const joinedString = (row: Row<D>) =>
+        columnIds.map(x => row.values[x]).join(' ');
       return matchSorter(rows, filterValue, {
         keys: [...columnIds, joinedString],
         threshold: rankings.ACRONYM,
@@ -189,12 +195,16 @@ export default function DataTable<D extends object>({
   };
 
   const noResults =
-    typeof noResultsText === 'function' ? noResultsText(filterValue as string) : noResultsText;
+    typeof noResultsText === 'function'
+      ? noResultsText(filterValue as string)
+      : noResultsText;
 
   const getNoResults = () => <div className="dt-no-results">{noResults}</div>;
 
   if (!columns || columns.length === 0) {
-    return (wrapStickyTable ? wrapStickyTable(getNoResults) : getNoResults()) as JSX.Element;
+    return (wrapStickyTable
+      ? wrapStickyTable(getNoResults)
+      : getNoResults()) as JSX.Element;
   }
 
   const shouldRenderFooter = columns.some(x => !!x.Footer);
@@ -203,7 +213,10 @@ export default function DataTable<D extends object>({
     <table {...getTableProps({ className: tableClassName })}>
       <thead>
         {headerGroups.map(headerGroup => {
-          const { key: headerGroupKey, ...headerGroupProps } = headerGroup.getHeaderGroupProps();
+          const {
+            key: headerGroupKey,
+            ...headerGroupProps
+          } = headerGroup.getHeaderGroupProps();
           return (
             <tr key={headerGroupKey || headerGroup.id} {...headerGroupProps}>
               {headerGroup.headers.map(column =>
@@ -223,19 +236,30 @@ export default function DataTable<D extends object>({
             const { key: rowKey, ...rowProps } = row.getRowProps();
             return (
               // UPDATION
-              <tr key={rowKey || row.id} {...rowProps}>
+              <tr
+                key={rowKey || row.id}
+                {...rowProps}
+                onClick={e => {
+                  handleRowClick(row);
+                  document
+                    .querySelector('.active-row')
+                    ?.classList.remove('active-row');
+                  e.currentTarget.classList.add('active-row');
+                }}
+              >
                 {row.cells.map(cell => {
                   if (
                     typeof cell.value === 'object' &&
                     cell.value !== 'null' &&
                     cell.value?.key === 'button'
                   ) {
-                    const { handleClick, label } = cell.value;
+                    const { handleClick } = cell.value;
                     return (
-                      <td>
-                        <Button buttonSize="small" onClick={handleClick}>
-                          {label}
-                        </Button>
+                      <td key={cell.column.id}>
+                        <EyeFilled
+                          style={{ fontSize: '18px', marginLeft: '40px' }}
+                          onClick={handleClick}
+                        />
                       </td>
                     );
                   }
@@ -256,10 +280,15 @@ export default function DataTable<D extends object>({
       {shouldRenderFooter && (
         <tfoot>
           {footerGroups.map(footerGroup => {
-            const { key: footerGroupKey, ...footerGroupProps } = footerGroup.getHeaderGroupProps();
+            const {
+              key: footerGroupKey,
+              ...footerGroupProps
+            } = footerGroup.getHeaderGroupProps();
             return (
               <tr key={footerGroupKey || footerGroup.id} {...footerGroupProps}>
-                {footerGroup.headers.map(column => column.render('Footer', { key: column.id }))}
+                {footerGroup.headers.map(column =>
+                  column.render('Footer', { key: column.id }),
+                )}
               </tr>
             );
           })}
@@ -279,7 +308,9 @@ export default function DataTable<D extends object>({
     setPageSize(initialPageSize);
   }
 
-  const paginationStyle: CSSProperties = sticky.height ? {} : { visibility: 'hidden' };
+  const paginationStyle: CSSProperties = sticky.height
+    ? {}
+    : { visibility: 'hidden' };
 
   let resultPageCount = pageCount;
   let resultCurrentPageSize = pageSize;
@@ -303,25 +334,36 @@ export default function DataTable<D extends object>({
       onServerPaginationChange(pageNumber, serverPageSize);
   }
   return (
-    <div ref={wrapperRef} style={{ width: initialWidth, height: initialHeight }}>
+    <div
+      ref={wrapperRef}
+      style={{ width: initialWidth, height: initialHeight }}
+    >
       {hasGlobalControl ? (
         <div ref={globalControlRef} className="form-inline dt-controls">
           <div className="row">
             <div className="col-sm-6">
-              {hasPagination ? (
+              {/* REMOVAL */}
+              {/* {hasPagination ? (
                 <SelectPageSize
                   total={resultsSize}
                   current={resultCurrentPageSize}
                   options={pageSizeOptions}
-                  selectRenderer={typeof selectPageSize === 'boolean' ? undefined : selectPageSize}
+                  selectRenderer={
+                    typeof selectPageSize === 'boolean'
+                      ? undefined
+                      : selectPageSize
+                  }
                   onChange={setPageSize}
                 />
-              ) : null}
+              ) : null} */}
+              {/* REMOVAL-END */}
             </div>
             {searchInput ? (
               <div className="col-sm-6">
                 <GlobalFilter<D>
-                  searchInput={typeof searchInput === 'boolean' ? undefined : searchInput}
+                  searchInput={
+                    typeof searchInput === 'boolean' ? undefined : searchInput
+                  }
                   preGlobalFilteredRows={preGlobalFilteredRows}
                   setGlobalFilter={setGlobalFilter}
                   filterValue={filterValue}

@@ -35,7 +35,11 @@ import { getColorFormatters } from '@superset-ui/chart-controls';
 
 import isEqualColumns from './utils/isEqualColumns';
 import DateWithFormatter from './utils/DateWithFormatter';
-import { DataColumnMeta, TableChartProps, TableChartTransformedProps } from './types';
+import {
+  DataColumnMeta,
+  TableChartProps,
+  TableChartTransformedProps,
+} from './types';
 
 const { PERCENT_3_POINT } = NumberFormats;
 const { DATABASE_DATETIME } = TimeFormats;
@@ -46,7 +50,9 @@ function isTimeColumn(key: string) {
 }
 
 function isNumeric(key: string, data: DataRecord[] = []) {
-  return data.every(x => x[key] === null || x[key] === undefined || typeof x[key] === 'number');
+  return data.every(
+    x => x[key] === null || x[key] === undefined || typeof x[key] === 'number',
+  );
 }
 
 const processDataRecords = memoizeOne(function processDataRecords(
@@ -56,7 +62,9 @@ const processDataRecords = memoizeOne(function processDataRecords(
   if (!data || !data[0]) {
     return data || [];
   }
-  const timeColumns = columns.filter(column => column.dataType === GenericDataType.TEMPORAL);
+  const timeColumns = columns.filter(
+    column => column.dataType === GenericDataType.TEMPORAL,
+  );
 
   if (timeColumns.length > 0) {
     return data.map(x => {
@@ -64,7 +72,9 @@ const processDataRecords = memoizeOne(function processDataRecords(
       timeColumns.forEach(({ key, formatter }) => {
         // Convert datetime with a custom date class so we can use `String(...)`
         // formatted value for global search, and `date.getTime()` for sorting.
-        datum[key] = new DateWithFormatter(x[key], { formatter: formatter as TimeFormatter });
+        datum[key] = new DateWithFormatter(x[key], {
+          formatter: formatter as TimeFormatter,
+        });
       });
       return datum;
     });
@@ -72,7 +82,9 @@ const processDataRecords = memoizeOne(function processDataRecords(
   return data;
 });
 
-const processColumns = memoizeOne(function processColumns(props: TableChartProps) {
+const processColumns = memoizeOne(function processColumns(
+  props: TableChartProps,
+) {
   const {
     datasource: { columnFormats, verboseMap },
     rawFormData: {
@@ -155,12 +167,13 @@ const processColumns = memoizeOne(function processColumns(props: TableChartProps
         config,
       };
     });
-  return [
-    metrics,
-    percentMetrics,
-    columns,
-  ] as [typeof metrics, typeof percentMetrics, typeof columns];
-}, isEqualColumns);
+  return [metrics, percentMetrics, columns] as [
+    typeof metrics,
+    typeof percentMetrics,
+    typeof columns,
+  ];
+},
+isEqualColumns);
 
 /**
  * Automatically set page size based on number of cells.
@@ -181,7 +194,9 @@ const getPageSize = (
   return numRecords * numColumns > 5000 ? 200 : 0;
 };
 
-const transformProps = (chartProps: TableChartProps): TableChartTransformedProps => {
+const transformProps = (
+  chartProps: TableChartProps,
+): TableChartTransformedProps => {
   const {
     height,
     width,
@@ -207,10 +222,15 @@ const transformProps = (chartProps: TableChartProps): TableChartTransformedProps
     conditional_formatting: conditionalFormatting,
     // ADDITION
     auto_select_first_column: autoSelectFirstColumn,
-    custom_modal: customModal,
-    request_method: requestMethod,
-    request_url: requestUrl,
+    feedback,
+    annotation_layer_number: annotationLayerNumber,
     primary_id: primaryId,
+    time_col: timeCol,
+    emit_time_range: emitTimeRange,
+    emit_time_range_start: emitTimeRangeStart,
+    feedback_page_size: feedbackPageSize,
+    selection_text: selectionText,
+    first_col_click: firstColClick,
     // ADDITION-END
   } = formData;
   const timeGrain = extractTimegrain(formData);
@@ -229,8 +249,12 @@ const transformProps = (chartProps: TableChartProps): TableChartTransformedProps
     rowCount = baseQuery?.rowcount ?? 0;
   }
   const data = processDataRecords(baseQuery?.data, columns);
-  const totals = showTotals && queryMode === QueryMode.aggregate ? totalQuery?.data[0] : undefined;
-  const columnColorFormatters = getColorFormatters(conditionalFormatting, data) ?? [];
+  const totals =
+    showTotals && queryMode === QueryMode.aggregate
+      ? totalQuery?.data[0]
+      : undefined;
+  const columnColorFormatters =
+    getColorFormatters(conditionalFormatting, data) ?? [];
 
   return {
     height,
@@ -260,10 +284,16 @@ const transformProps = (chartProps: TableChartProps): TableChartTransformedProps
     timeGrain,
     // ADDITION
     autoSelectFirstColumn,
-    customModal,
-    requestMethod,
-    requestUrl,
+    feedback,
+    annotationLayerNumber,
     primaryId,
+    timeCol,
+    emitTimeRange,
+    emitTimeRangeStart,
+    feedbackPageSize,
+    selectionText,
+    firstColClick,
+    dashboardNativeFilters: formData.extra_form_data,
     // ADDITION-END
   };
 };
